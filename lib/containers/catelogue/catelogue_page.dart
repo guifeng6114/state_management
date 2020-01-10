@@ -5,7 +5,7 @@ class CateloguePage extends StatelessWidget {
   final List<String> catelogue = [
     'State & Props（状态 & 属性）', 'Downward Data Flow（单向数据流）', 'State Improvement（状态提升）',
     'Smart | Dumb?（聪明组件 or 笨组件？）', 'Why State Management?（状态管理？）',
-    'InheritedWidget（数据共享组件）', 'EventBus（事件总线）',
+    'InheritedWidget（数据共享组件）', 'EventBus（事件总线）', 'BuildContext',
     'Provider, Redux, Bloc and MobX'
   ];
 
@@ -47,7 +47,7 @@ class CateloguePage extends StatelessWidget {
                 return;
               }
 
-              if (cateIndex == 4 || cateIndex == 5) {
+              if (cateIndex == 4 || cateIndex == 5|| cateIndex == 8) {
                 return;
               }
 

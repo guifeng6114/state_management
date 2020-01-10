@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:state_management/components/shared_data_widget.dart';
 
-class WithoutStateWidget extends StatelessWidget {
-
-  final int count;
-
-  WithoutStateWidget(this.count);
+class WithoutStateInheritedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     print(context);
+    final int count = SharedDataWidget.of(context).data;
+
     return Container(
       width: double.infinity,
       height: 200,

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:state_management/components/shared_data_widget.dart';
 import 'package:state_management/containers/origin/downward_data_page.dart';
 import 'package:state_management/containers/origin/inherited_widget_page.dart';
 import 'package:state_management/containers/origin/state_improvement_page.dart';

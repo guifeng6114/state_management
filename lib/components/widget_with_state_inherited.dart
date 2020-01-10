@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:state_management/components/shared_data_widget.dart';
 
-class WithStateWidget extends StatefulWidget {
-
-  final getCount;
-
-  WithStateWidget({ this.getCount });
+class WithStateInheritedWidget extends StatefulWidget {
 
   @override
-  _WithStateWidgetState createState() => _WithStateWidgetState();
+  _WithStateInheritedWidgetState createState() => _WithStateInheritedWidgetState();
 
 }
 
-class _WithStateWidgetState extends State<WithStateWidget> {
+class _WithStateInheritedWidgetState extends State<WithStateInheritedWidget> {
 
   int count = 0;
 
@@ -41,9 +38,8 @@ class _WithStateWidgetState extends State<WithStateWidget> {
                   onPressed: () {
                     setState(() {
                       count++;
-                      if (widget.getCount != null) {
-                        widget.getCount(count);
-                      }
+                      SharedDataWidget.of(context)
+                        .action(count);
                     });
                   } 
                 ),
@@ -54,9 +50,8 @@ class _WithStateWidgetState extends State<WithStateWidget> {
                   onPressed: () {
                     setState(() {
                       count--;
-                      if (widget.getCount != null) {
-                        widget.getCount(count);
-                      }
+                      SharedDataWidget.of(context)
+                        .action(count);
                     });
                   } 
                 ),

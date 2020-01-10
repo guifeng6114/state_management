@@ -23,6 +23,7 @@ class _StateAndPropsState extends State<StateAndPropsPage> {
   }
 
   Widget _buildBody() {
+    print(context);
     return Container(
       padding: EdgeInsets.all(20.0),
       child: Column(
