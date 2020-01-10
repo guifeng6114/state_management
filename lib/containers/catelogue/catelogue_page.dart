@@ -41,9 +41,17 @@ class CateloguePage extends StatelessWidget {
             ),
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
-              if (cateIndex == 1) {
-                Navigator.of(context).pushNamed('/origin/$cateIndex');
+              if (cateIndex == 2) {
+                Navigator.of(context)
+                  .pushNamed('/origin/$cateIndex', arguments: catelogue[index]);
+                return;
               }
+
+              if (cateIndex == 4 || cateIndex == 5) {
+                return;
+              }
+
+              Navigator.of(context).pushNamed('/origin/$cateIndex');
             },
           ),
         );

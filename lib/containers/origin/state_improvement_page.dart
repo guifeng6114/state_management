@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:state_management/components/widget_with_state.dart';
 import 'package:state_management/components/widget_without_state.dart';
 
-class StateAndPropsPage extends StatefulWidget {
+class StateImprovementPage extends StatefulWidget {
 
   @override
-  _StateAndPropsState createState() => _StateAndPropsState();
+  _StateImprovementPageState createState() => _StateImprovementPageState();
 
 }
 
-class _StateAndPropsState extends State<StateAndPropsPage> {
+class _StateImprovementPageState extends State<StateImprovementPage> {
+
+  int count = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('State & Props'),
+        title: Text('State Improvement'),
         centerTitle: true,
       ),
       body: _buildBody()
@@ -29,12 +31,23 @@ class _StateAndPropsState extends State<StateAndPropsPage> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          WithStateWidget(),
-          WithoutStateWidget(3)
+          Text(
+            'SuperCount: $count',
+            style: TextStyle(
+              fontSize: 16.0
+            ),
+          ),
+          WithStateWidget(getCount: getCount),
+          WithoutStateWidget(count)
         ],
       ),
     );
   }
 
-}
+  void getCount(int count) {
+    setState(() {
+      this.count = count;
+    });
+  }
 
+}

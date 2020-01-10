@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue
       ),
       home: CateloguePage(),
-      routes: router(context),
+      routes: router(context)
     );
   }
 }
