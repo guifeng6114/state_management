@@ -489,4 +489,412 @@ Dumb 组件的存在意义主要是为了复用，因为没有强绑定业务的
 一个 Dumb 组件最好不要引用 Smart 组件，因为一旦引用就会导致无法复用，所以尽可能不要做这种事。  
 
 ![Smart_or_Dumb](./assets/md_images/SmartOrDumb.png)  
----
+
+---  
+## 5. Why State Management？（状态管理？）  
+像第三部分所讲的状态提升，是存在局限性的，如果数据的共享嵌套一层两层还好说，但是如果嵌套了很多层，那么通过层级传递函数的方法就会特别反人类。所以此时需要的就是状态管理，它可以让你跨组件间的共享数据。  
+Flutter 本身提供了一个用来共享数据的组件 `InheritedWidget`， 当然，也可以使用第三方提供的状态管理的包，如 `Provider`， `Redux`， `Bloc`， 以及 `Mobx`。是否使用包也是看应用的复杂度来实际调整的，如果简单的应用，Flutter 自身提供的组件也能完成任务（如 InheritedWidget， Eventbus），则完全没必要使用第三方包。  
+
+---  
+## 6. InheritedWidget （数据共享组件）  
+Flutter 提供的 `InheritedWidget` 在思想上跟 `React 自带的 Context` 是一样的。实现的方式，都是在 应用的**顶层定义了一个专门存放数据的组件**，然后该组件**对外提供了一个获取数据的方法**。而需要使用该数据的组件一定**是这个存放数据的组件的子孙组件**， 这样，当子孙组件调用数据组件对外的方法时，就会**在该数据组件中取到对应的数据**。如下图：  
+![InheritedWidget](./assets/md_images/InheritedWidget.png)  
+
+下面是 Demo：
+1. 首先，实现一个存放数据的 `InheritedWidget`：
+```dart
+/// data is the data that need to store
+/// action is a function that how to change data
+/// child is sub widget need to render in this data widget
+class SharedDataWidget extends InheritedWidget {
+
+  SharedDataWidget({ 
+    @required this.data,
+    @required this.action,
+    Widget child
+  }): super(child: child);
+
+  final int data;
+
+  final action;
+
+  static SharedDataWidget of(BuildContext context) {
+    /// return context.inheritFromWidgetOfExactType(targetType)
+    /// inheritFromWidgetOfExactType(targetType) => dependOnInheritedWidgetOfExactType()
+    return context.dependOnInheritedWidgetOfExactType();
+  }
+
+  @override
+  bool updateShouldNotify(SharedDataWidget old) {
+    /// 如果返回true，则子树中依赖(build函数中有调用)本widget
+    /// 的子widget的`state.didChangeDependencies`会被调用
+    return old.data != data;
+  }
+
+}
+```
+其中有两个点：
+> static SharedDataWidget of() 方法中， 有一个   
+`context.dependOnInheritedWidgetOfExactType()`，这个是用来找到距离当前子组件最近的InheritedWidget（向上查找）。  
+> bool updateShouldNotify(SharedDataWidget old) 方法，此方法如果返回 `true`， 则代表依赖此数据组件的子组件会调用 `didChangeDependencies`（即重新渲染）。 
+2. 将其作为 app 的顶级组件，并传入数据 以及其子组件：
+```dart
+class InheritedWidgetPage extends StatefulWidget {
+
+  @override
+  _InheritedWidgetPageState createState() => _InheritedWidgetPageState();
+
+}
+
+class _InheritedWidgetPageState extends State<InheritedWidgetPage> {
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    /// the top widget of app
+    /// to share the data to all it's sub widgets
+    return SharedDataWidget(
+      data: count,
+      action: changeCount,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Inherited Widget'
+          ),
+          centerTitle: true,
+        ),
+        body: _buildBody()
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    print(context);
+
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          WithStateInheritedWidget(),
+          WithoutStateInheritedWidget()
+        ],
+      ),
+    );
+  }
+
+  /// a function that change sharedDataWidget's state
+  /// and then, all sub widget will rebuild
+  changeCount(int count) {
+    setState(() {
+      this.count = count;
+    });
+  }
+
+}
+```  
+提供一个修改数据的方法，当 `SharedDataWidget` 的 `state` 被修改时，将触发它的子组件重新渲染。  
+
+3. 在依赖于数据组件的子组件中，通过提供的方法引用或者修改数据：  
+```dart
+
+/// widget depend on the shared data widget
+/// to display the data named count
+class WithoutStateInheritedWidget extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    print(context);
+
+    /// get data from the of function of sharedDataWidget 
+    final int count = SharedDataWidget.of(context).data;
+
+    return Container(
+      width: double.infinity,
+      height: 200,
+      padding: EdgeInsets.only(top: 30.0),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: Colors.black26),
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Widget Without State Inherit Ver.',
+            style: TextStyle(
+              fontSize: 24.0
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child:  Text(
+                'count: $count',
+                style: TextStyle(
+                  fontSize: 24.0
+                )
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+}
+
+class WithStateInheritedWidget extends StatefulWidget {
+
+  @override
+  _WithStateInheritedWidgetState createState() => _WithStateInheritedWidgetState();
+
+}
+
+class _WithStateInheritedWidgetState extends State<WithStateInheritedWidget> {
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    print(context);
+    return Container(
+        /// ...other code
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                _buildButton(
+                  buttonColor: Colors.blue,
+                  fontColor: Colors.white,
+                  icon: Icons.add,
+                  onPressed: () {
+                    setState(() {
+                      count++;
+                      SharedDataWidget.of(context)
+                        .action(count);
+                    });
+                  } 
+                ),
+       /// ...other code
+    );
+  }
+
+  /// ...other code
+
+}
+```
+在依赖 `SharedDataWidget` 数据的组件中，引用 `of` 方法，来获取 `SharedDataWidget` 自身，然后可以获取 `SharedDataWidget` 提供的数据或者方法。  
+
+---  
+
+## 7. EventBus (事件总线)  
+所谓的事件总线其实就是 dart 版本的 EventEmitter。（订阅者模式）  
+Flutter 并没有提供事件总线。所以可以使用第三方库（eventbus.dart）。  
+以下是实现的一个简单的 Eventbus 类：
+```dart
+typedef void EventCallback(arg);
+
+class EventBus {
+
+  EventBus._internal();
+
+  static EventBus _singleton = new EventBus._internal();
+
+  /// use singleton pattern
+  /// let this class always return a single instance
+  factory EventBus() => _singleton;
+
+  var _emap = new Map<Object, List<EventCallback>>();
+
+  void on(eventName, EventCallback f) {
+    if (eventName == null || f == null) return;
+    _emap[eventName] ??= new List<EventCallback>();
+    _emap[eventName].add(f);
+  }
+
+  void off(eventName, [EventCallback f]) {
+    var list = _emap[eventName];
+    if (eventName == null || list == null) return;
+    if (f == null) {
+      _emap[eventName] = null;
+    } else {
+      list.remove(f);
+    }
+  }
+
+  void emit(eventName, [arg]) {
+    var list = _emap[eventName];
+    if (list == null) return;
+    int len = list.length - 1;
+    for (var i = len; i > -1; --i) {
+      list[i](arg);
+    }
+  }
+
+}
+```
+因为使用了单例模式，所以在全局只会有一个 Eventbus，使用方法如下：  
+```dart
+/// widget emit data to listeners
+class WithStateEventWidget extends StatefulWidget {
+
+  @override
+  _WithStateEventWidgetState createState() => _WithStateEventWidgetState();
+
+}
+
+class _WithStateEventWidgetState extends State<WithStateEventWidget> {
+
+  int count = 0;
+
+  final EventBus bus = EventBus();
+
+  @override
+  Widget build(BuildContext context) {
+    print(context);
+    return Container(
+      width: double.infinity,
+      height: 200,
+      padding: EdgeInsets.only(top: 30.0),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Widget With State Eventbus Ver.',
+            style: TextStyle(
+              fontSize: 24.0
+            )
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                _buildButton(
+                  buttonColor: Colors.blue,
+                  fontColor: Colors.white,
+                  icon: Icons.add,
+                  onPressed: () {
+                    setState(() {
+                      count++;
+                      /// emit the data to listeners
+                      bus.emit('changeCount', count);
+                    });
+                  } 
+                ),
+                _buildButton(
+                  buttonColor: Colors.blue,
+                  fontColor: Colors.white,
+                  icon: Icons.remove,
+                  onPressed: () {
+                    setState(() {
+                      count--;
+                      /// emit the data to listeners
+                      bus.emit('changeCount', count);
+                    });
+                  } 
+                ),
+                Text(
+                  'count: $count',
+                  style: TextStyle(
+                    fontSize: 24.0
+                  )
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: Colors.black26),
+      ),
+    );
+  }
+
+  Widget _buildButton({ Color buttonColor, Color fontColor, icon, onPressed }) {
+    return Ink(
+      child: IconButton(
+        icon: Icon(icon),
+        onPressed: onPressed,
+        color: fontColor,
+      ),
+      decoration: ShapeDecoration(
+        color: Colors.lightBlue,
+        shape: CircleBorder(),
+      ),
+    );
+  }
+
+}
+
+/// widget subscribe the data change
+class WithoutStateEventWidget extends StatefulWidget {
+
+  @override
+  _WithoutStateEventWidgetState createState() => _WithoutStateEventWidgetState();
+
+}
+
+class _WithoutStateEventWidgetState extends State<WithoutStateEventWidget> {
+
+  final EventBus bus = EventBus();
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    print(context);
+
+    return Container(
+      width: double.infinity,
+      height: 200,
+      padding: EdgeInsets.only(top: 30.0),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: Colors.black26),
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Widget Without State Event Ver.',
+            style: TextStyle(
+              fontSize: 24.0
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child:  Text(
+                'count: $count',
+                style: TextStyle(
+                  fontSize: 24.0
+                )
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  /// when widget initialized or dispose
+  /// register and unregister the eventbus
+  @override
+  void initState() {
+    super.initState();
+    bus.on('changeCount', (count) {
+      setState(() {
+        this.count = count;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bus.off('changeCount');
+  }
+
+}
+```  
+使用时，记得在生命周期开始注册，在生命周期结束时注销，避免内存泄漏。  
+
+---  
+
+To be continued...
