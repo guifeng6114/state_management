@@ -478,7 +478,7 @@ class _WithStateWidgetState extends State<WithStateWidget> {
 
 ---
 
-## 4. Smart | Dumb? （聪明组件 or 笨组件？）  
+## 4. Smart | Dumb? （聪明组件 or 笨组件？）   
 - Dumb 组件： 只负责渲染，或执行父组件传递的函数或者方法的组件，可以拥有自己的状态，但是它的状态不会向下传递或者参与逻辑。  
 比如， 一个显示文字的组件，文字是父组件通过props传递的，而它自身也有一个状态，用来修改自己的背景颜色，但是这个颜色又不影响整个app 的逻辑。  
 
@@ -488,5 +488,5 @@ class _WithStateWidgetState extends State<WithStateWidget> {
 Dumb 组件的存在意义主要是为了复用，因为没有强绑定业务的逻辑和数据。  
 一个 Dumb 组件最好不要引用 Smart 组件，因为一旦引用就会导致无法复用，所以尽可能不要做这种事。  
 
-![Smart or Dumb](./assets/md_images/SmartOrDumb.png)  
+![Smart_or_Dumb](./assets/md_images/SmartOrDumb.png)  
 ---
