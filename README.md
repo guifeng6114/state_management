@@ -498,6 +498,7 @@ Flutter 本身提供了一个用来共享数据的组件 `InheritedWidget`， �
 ---  
 ## 6. InheritedWidget （数据共享组件）  
 Flutter 提供的 `InheritedWidget` 在思想上跟 `React 自带的 Context` 是一样的。实现的方式，都是在 应用的**顶层定义了一个专门存放数据的组件**，然后该组件**对外提供了一个获取数据的方法**。而需要使用该数据的组件一定**是这个存放数据的组件的子孙组件**， 这样，当子孙组件调用数据组件对外的方法时，就会**在该数据组件中取到对应的数据**。如下图：  
+
 ![InheritedWidget](./assets/md_images/InheritedWidget.png)  
 
 下面是 Demo：
