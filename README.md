@@ -265,4 +265,216 @@ class DownwardDataPage extends StatelessWidget {
 }
 ```
 
-可以看到 父组件 通过 子组件 的构造函数将数据传递给子组件，也就是 `props`，然后子组件通过 `props` 渲染 UI。
+可以看到 父组件 通过 子组件 的构造函数将数据传递给子组件，也就是 `props`，然后子组件通过 `props` 渲染 UI。  
+
+---
+
+## 3. State Improvement （状态提升）  
+
+状态提升指， 如果 `相邻或者同级别的组件` 之间需要 `共享状态`，鉴于单向数据流动的原因，只能将共享的状态或者数据交给此相邻组件的 `共同的父组件` 保管。  
+例如下图：  
+![state_improvement1](./assets/state_improvement1.png)  
+其中 list2 假如也需要用到 comments 这个状态（数据），为了使comments 共享， 改成如下的形式：
+![state_improvement2](./assets/state_improvement2.png)
+将 `comments` 的状态提升至 list1和list2 共同的父组件 `commentsApp` 中， 然后将其作为 `props` 传递至 两个 list中。comments 作为 commentsApp 的 `state`， 当 comments 更新时，渲染在 app 中的 两个 list 组件会因为 app 的更新而更新（props 也会更新）。  
+
+下面是 Demo：
+```dart 
+/// the super widget with two sub widget
+/// one is stateful and another is stateless
+/// create a function that can change super widget's state
+class StateImprovementPage extends StatefulWidget {
+
+  @override
+  _StateImprovementPageState createState() => _StateImprovementPageState();
+
+}
+
+class _StateImprovementPageState extends State<StateImprovementPage> {
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('State Improvement'),
+        centerTitle: true,
+      ),
+      body: _buildBody()
+    );
+  }
+
+  Widget _buildBody() {
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Text(
+            'SuperCount: $count',
+            style: TextStyle(
+              fontSize: 16.0
+            ),
+          ),
+          WithStateWidget(getCount: getCount),
+          WithoutStateWidget(count)
+        ],
+      ),
+    );
+  }
+
+  void getCount(int count) {
+    setState(() {
+      this.count = count;
+    });
+  }
+
+}
+
+/// the widget without state
+/// initialized use the props which the super widget passed in
+class WithoutStateWidget extends StatelessWidget {
+
+  final int count;
+
+  WithoutStateWidget(this.count);
+
+  @override
+  Widget build(BuildContext context) {
+    print(context);
+    return Container(
+      width: double.infinity,
+      height: 200,
+      padding: EdgeInsets.only(top: 30.0),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: Colors.black26),
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Widget Without State',
+            style: TextStyle(
+              fontSize: 24.0
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child:  Text(
+                'count: $count',
+                style: TextStyle(
+                  fontSize: 24.0
+                )
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+} 
+
+/// widget with state
+/// a function which passed by super widget
+/// to change the state of super widget
+class WithStateWidget extends StatefulWidget {
+
+  final getCount;
+
+  WithStateWidget({ this.getCount });
+
+  @override
+  _WithStateWidgetState createState() => _WithStateWidgetState();
+
+}
+
+class _WithStateWidgetState extends State<WithStateWidget> {
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    print(context);
+    return Container(
+      width: double.infinity,
+      height: 200,
+      padding: EdgeInsets.only(top: 30.0),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Widget With State',
+            style: TextStyle(
+              fontSize: 24.0
+            )
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                _buildButton(
+                  buttonColor: Colors.blue,
+                  fontColor: Colors.white,
+                  icon: Icons.add,
+                  onPressed: () {
+                    setState(() {
+                      count++;
+                      if (widget.getCount != null) {
+                        widget.getCount(count);
+                      }
+                    });
+                  } 
+                ),
+                _buildButton(
+                  buttonColor: Colors.blue,
+                  fontColor: Colors.white,
+                  icon: Icons.remove,
+                  onPressed: () {
+                    setState(() {
+                      count--;
+                      if (widget.getCount != null) {
+                        widget.getCount(count);
+                      }
+                    });
+                  } 
+                ),
+                Text(
+                  'count: $count',
+                  style: TextStyle(
+                    fontSize: 24.0
+                  )
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: Colors.black26),
+      ),
+    );
+  }
+
+  Widget _buildButton({ Color buttonColor, Color fontColor, icon, onPressed }) {
+    return Ink(
+      child: IconButton(
+        icon: Icon(icon),
+        onPressed: onPressed,
+        color: fontColor,
+      ),
+      decoration: ShapeDecoration(
+        color: Colors.lightBlue,
+        shape: CircleBorder(),
+      ),
+    );
+  }
+
+}
+```
+
+之前说过，在单向数据流中需要以特殊的方式使数据返回。  
+在此例中，父组件 `StateImprovementPage` 实现了一个 `getCount()` 方法， 用来修改父组件自身的状态（`State`），然后将它作为一个属性（`props`）传递给了子组件 `WithStateWidget`，每当点击加减按钮时，会执行父组件的该方法，从而更新父组件的状态，达成 `数据反流` 的目的。 
+
+---
+
