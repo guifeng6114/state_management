@@ -1,6 +1,6 @@
 # Flutter State Management  
 
-## 1. State & Props  
+## 1. State & Props （状态 & 属性）  
 什么是 Props？  
 `Props` 是由 `父组件` 传递给 `子组件` 的 **变量或者数据（甚至是函数，方法）**，它在子组件构造函数执行初始化时被初始化，初始化后 `不能被修改`。
 
@@ -160,3 +160,109 @@ class _WithStateWidgetState extends State<WithStateWidget> {
 2. 其次，要在组件内部通过 `createState()` 实例化该组件的状态类。  
 3. 实现一个该组件的 `状态类`，包括渲染 `UI树` 的方法。
 4. `state` 通过 `widget.xxxx` 的方式调用组件类中的属性和方法。
+
+---
+
+## 2. Downward Data Flow （单向数据流）  
+单向数据流指的是数据在 Flutter App 中的流动方向， 它总是从上到下流动的，即数据总是通过 父组件 流动到 子组件， 如果想要数据的反向流动， 一般方式是做不到的，需要通过特殊的方法（比如通过传递回调函数的方式）。  
+下面是一个单向数据流的小 Demo：  
+```dart
+/// router pass a text to demo page
+Map<String, WidgetBuilder> router(context) {
+  return {
+    // ...other code
+    '/origin/2': (context) => DownwardDataPage(
+      text: ModalRoute.of(context).settings.arguments
+    ),
+    // ...other code
+  };
+}
+
+/// page get the text and initialized,
+/// and let the text down to their sub widget
+class DownwardDataPage extends StatelessWidget {
+
+  final String text;
+
+  DownwardDataPage({ @required this.text });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Downward Data Flow'),
+        centerTitle: true,
+      ),
+      body: _buildPageContainer(text + '1')
+    );
+  }
+
+  Widget _buildPageContainer(String displayText) {
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Page: $displayText',
+            style: TextStyle(
+              fontSize: 16.0
+            )
+          ),
+          _buildOuterContainer(displayText + '2')
+        ],
+      )
+    );
+  }
+
+  Widget _buildOuterContainer(String displayText) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.0),
+      margin: EdgeInsets.only(top: 20.0),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Outer: $displayText',
+            style: TextStyle(
+              fontSize: 16.0
+            )
+          ),
+          _buildInnerContainer(displayText + '3')
+        ],
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(
+          width: 1.0,
+          color: Colors.black26
+        )
+      ),
+    );
+  }
+
+  Widget _buildInnerContainer(String displayText) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.0),
+      margin: EdgeInsets.only(top: 20.0),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Inner: $displayText',
+            style: TextStyle(
+              fontSize: 16.0
+            )
+          ),
+        ],
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(
+          width: 1.0,
+          color: Colors.black26
+        )
+      ),
+    );
+  }
+}
+```
+
+可以看到 父组件 通过 子组件 的构造函数将数据传递给子组件，也就是 `props`，然后子组件通过 `props` 渲染 UI。
