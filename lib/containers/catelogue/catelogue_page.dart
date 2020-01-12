@@ -16,24 +16,27 @@ class CateloguePage extends StatelessWidget {
         title: Text('Catelogue'),
         centerTitle: true,
       ),
-      body: _buildBody(),
+      body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.comment),
         backgroundColor: Colors.blue,
         onPressed: () {
-          print('float button');
+          
         },
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(context) {
+    print(context);
+
     return ListView.separated(
       itemCount: catelogue.length,
       itemBuilder: (BuildContext context, int index) {
+        print(context);
         final cateIndex = index + 1;
         return Container(
-          padding: EdgeInsets.only(left: 16.0),
+          padding: EdgeInsets.only(left: 10.0),
           child: ListTile(
             title: Text("$cateIndex. ${ catelogue[index] }"),
             contentPadding: EdgeInsets.symmetric(

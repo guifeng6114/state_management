@@ -22,7 +22,7 @@ class _WithStateInheritedWidgetState extends State<WithStateInheritedWidget> {
       child: Column(
         children: <Widget>[
           Text(
-            'Widget With State',
+            'Widget With State Inherited Ver.',
             style: TextStyle(
               fontSize: 24.0
             )

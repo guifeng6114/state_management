@@ -3,6 +3,7 @@ import 'package:state_management/router/router.dart';
 
 import 'containers/catelogue/catelogue_page.dart';
 
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter state management',
+      title: 'Flutter State Management',
       theme: ThemeData(
         primarySwatch: Colors.blue
       ),

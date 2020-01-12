@@ -18,7 +18,7 @@ class WithoutStateInheritedWidget extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Text(
-            'Widget Without State',
+            'Widget Without State Inherit Ver.',
             style: TextStyle(
               fontSize: 24.0
             ),
