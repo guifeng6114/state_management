@@ -273,9 +273,9 @@ class DownwardDataPage extends StatelessWidget {
 
 状态提升指， 如果 `相邻或者同级别的组件` 之间需要 `共享状态`，鉴于单向数据流动的原因，只能将共享的状态或者数据交给此相邻组件的 `共同的父组件` 保管。  
 例如下图：  
-![state_improvement1](./assets/state_improvement1.png)  
+![state_improvement1](./assets/md_images/state_improvement1.png)  
 其中 list2 假如也需要用到 comments 这个状态（数据），为了使comments 共享， 改成如下的形式：
-![state_improvement2](./assets/state_improvement2.png)
+![state_improvement2](./assets/md_images/state_improvement2.png)
 将 `comments` 的状态提升至 list1和list2 共同的父组件 `commentsApp` 中， 然后将其作为 `props` 传递至 两个 list中。comments 作为 commentsApp 的 `state`， 当 comments 更新时，渲染在 app 中的 两个 list 组件会因为 app 的更新而更新（props 也会更新）。  
 
 下面是 Demo：
@@ -478,3 +478,15 @@ class _WithStateWidgetState extends State<WithStateWidget> {
 
 ---
 
+## 4. Smart | Dumb? （聪明组件 or 笨组件？）  
+- Dumb 组件： 只负责渲染，或执行父组件传递的函数或者方法的组件，可以拥有自己的状态，但是它的状态不会向下传递或者参与逻辑。  
+比如， 一个显示文字的组件，文字是父组件通过props传递的，而它自身也有一个状态，用来修改自己的背景颜色，但是这个颜色又不影响整个app 的逻辑。  
+
+- Smart 组件： 不仅仅负责渲染，还会参于逻辑的运算。自身状态会作为数据的一部分， 可能会向下传递。因为复杂度高，所以性能比 Dumb 组件要低。  
+
+关于 Smart 和 Dumb 组件的划分，完全取决于具体的业务，还有应用自身的复杂度。不能说全是 Dumb 组件就是最好的，也不能都是 Smart组件。  
+Dumb 组件的存在意义主要是为了复用，因为没有强绑定业务的逻辑和数据。  
+一个 Dumb 组件最好不要引用 Smart 组件，因为一旦引用就会导致无法复用，所以尽可能不要做这种事。  
+
+![Smart or Dumb](./assets/md_images/SmartOrDumb.png)  
+---
