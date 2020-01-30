@@ -1,8 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:state_management/containers/origin/bloc_page.dart';
 import 'package:state_management/containers/origin/downward_data_page.dart';
 import 'package:state_management/containers/origin/eventbus_page.dart';
 import 'package:state_management/containers/origin/inherited_widget_page.dart';
+import 'package:state_management/containers/origin/provider_page.dart';
+import 'package:state_management/containers/origin/redux_page.dart';
+import 'package:state_management/containers/origin/state_catelogue_page.dart';
 import 'package:state_management/containers/origin/state_improvement_page.dart';
 import 'package:state_management/containers/origin/state_props_page.dart';
 
@@ -14,7 +18,17 @@ Map<String, WidgetBuilder> router(context) {
     ),
     '/origin/3': (context) => StateImprovementPage(),
     '/origin/6': (context) => InheritedWidgetPage(),
-    '/origin/7': (context) => EventBusPage()
+    '/origin/7': (context) => EventBusPage(),
+    '/origin/9': (context) => StateCateloguePage(),
+    '/origin/provider': (context) => ProviderPage(
+      title: ModalRoute.of(context).settings.arguments
+    ),
+    '/origin/redux': (context) => ReduxPage(
+      title: ModalRoute.of(context).settings.arguments
+    ),
+    '/origin/bloc': (context) => BlocPage(
+      title: ModalRoute.of(context).settings.arguments
+    ),
   };
 }
 
