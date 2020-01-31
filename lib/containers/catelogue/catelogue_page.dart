@@ -18,10 +18,15 @@ class CateloguePage extends StatelessWidget {
       ),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.comment),
+        child: Text(
+          'Demo',
+          style: TextStyle(
+            fontSize: 16.0
+          ),
+        ),
         backgroundColor: Colors.blue,
         onPressed: () {
-          
+          Navigator.of(context).pushNamed('/management/catelogue');
         },
       ),
     );

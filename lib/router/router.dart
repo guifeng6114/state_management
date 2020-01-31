@@ -1,5 +1,14 @@
 
 import 'package:flutter/material.dart';
+import 'package:state_management/containers/management/bloc/management_bloc_articles.dart';
+import 'package:state_management/containers/management/bloc/management_bloc_comments.dart';
+import 'package:state_management/containers/management/bloc/management_bloc_input.dart';
+import 'package:state_management/containers/management/bloc/management_bloc_login.dart';
+import 'package:state_management/containers/management/management_catelogue.dart';
+import 'package:state_management/containers/management/redux/management_redux_articles.dart';
+import 'package:state_management/containers/management/redux/management_redux_comments.dart';
+import 'package:state_management/containers/management/redux/management_redux_input.dart';
+import 'package:state_management/containers/management/redux/management_redux_login.dart';
 import 'package:state_management/containers/origin/bloc_page.dart';
 import 'package:state_management/containers/origin/downward_data_page.dart';
 import 'package:state_management/containers/origin/eventbus_page.dart';
@@ -28,6 +37,19 @@ Map<String, WidgetBuilder> router(context) {
     ),
     '/origin/bloc': (context) => BlocPage(
       title: ModalRoute.of(context).settings.arguments
+    ),
+    '/management/catelogue': (context) => ManagementCateloguePage(),
+    '/management/redux-login': (context) => ManagementReduxLoginPage(),
+    '/management/redux-articles': (context) => ManagementReduxArticlesPage(),
+    '/management/redux-details': (context) => ManagementReduxCommentsPage(),
+    '/management/redux-submit': (context) => ManagementReduxInputPage(
+      pageType: ModalRoute.of(context).settings.arguments,
+    ),
+    '/management/bloc-login': (context) => ManagementBlocLoginPage(),
+    '/management/bloc-articles': (context) => ManagementBlocArticlesPage(),
+    '/management/bloc-details': (context) => ManagementBlocCommentsPage(),
+    '/management/bloc-submit': (context) => ManagementBlocInputPage(
+      pageType: ModalRoute.of(context).settings.arguments,
     ),
   };
 }
